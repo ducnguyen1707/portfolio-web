@@ -27,6 +27,7 @@
   "homepage": "https://github.com/ducnguyen1707/portfolio-web#readme",
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
+    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
