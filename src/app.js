@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.routes.js';
-import sercurityMiddleware from './middleware/security.middleware.js';
+import securityMiddleware from './middleware/security.middleware.js';
 
 const app = express();
 app.use(express.json());
@@ -22,6 +22,7 @@ app.use(
 // to logger.info after trimming extra whitespace.
 
 app.use(securityMiddleware);
+
 app.get('/', (req, res) => {
   logger.info('Welcome to DucNguyen Portfolio');
   res.status(200).send('Hi');

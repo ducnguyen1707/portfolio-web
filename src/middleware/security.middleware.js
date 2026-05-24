@@ -1,10 +1,10 @@
-import aj from '../config/arjet.js';
+import aj from '../config/arcjet.js';
 import logger from '../config/logger.js';
-import { silingWindow } from '@aj-ratelimit/siling-window';
+import { slidingWindow } from '@arcjet/node';
 
 const securityMiddleware = async (req, res, next) => {
     try{
-        const role = req.user?.req.user.role || "guest";
+        const role = req.user?.role|| "guest";
         let limit;
         let message;
         switch(role){
@@ -21,10 +21,10 @@ const securityMiddleware = async (req, res, next) => {
                 message = "Guest request limit exceeded 5 minute";
             break;
         }
-        const client = aj.withRule(silingWindow({mode: 'LIVE', interval: '1m', max: limit, name: `S{role}-rate-limt`}));
-        const desicion = await client.protect(req);
+        const client = aj.withRule(slidingWindow({mode: 'LIVE', interval: '1m', max: limit, name: `${role}-rate-limt`}));
+        const decision = await client.protect(req);
 
-        if(desicion.isDenied() && decision.reason.isBot())
+        if(decision.isDenied() && decision.reason.isBot())
             {
                 logger.warn('Bot decteced', {
                     ip: req.ip,
@@ -34,7 +34,7 @@ const securityMiddleware = async (req, res, next) => {
                 return res.status(403).json({error: "Fobbiden", message: "Bot detected. Access denied."});
         };  
         
-        if(desicion.isDenied() && decision.reason.isShield())
+        if(decision.isDenied() && decision.reason.isShield())
             {
                 logger.warn('Shield block request', {
                     ip: req.ip,
@@ -45,7 +45,7 @@ const securityMiddleware = async (req, res, next) => {
                 return res.status(403).json({error: "Fobbiden", message: "This request has been block by security policies."});
         }; 
 
-        if(desicion.isDenied() && decision.reason.isRateLimit())
+        if(decision.isDenied() && decision.reason.isRateLimit())
             {
                 logger.warn('Rate limit exceeded', {
                     ip: req.ip,
@@ -58,7 +58,8 @@ const securityMiddleware = async (req, res, next) => {
         next();
 
     }catch(e){
-        consoler.error("Arcjet Middleware error");
+        console.error("Arcjet Middleware error");
         res.status(500).json({error: "Internal server error", message: "something went wrong with the security middleware"});
     }
 }
+export default securityMiddleware;
